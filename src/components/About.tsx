@@ -33,29 +33,6 @@ export default function About() {
         style={{ y: bgY }}
         className="absolute bottom-0 left-0 w-72 h-72 rounded-full blur-3xl bg-accent/5 pointer-events-none"
       />
-      {/* Floating shapes */}
-      <motion.div
-        className="absolute top-[10%] right-[8%] w-3 h-3 border border-primary/10 rotate-45"
-        animate={{ rotate: [45, 225, 45], scale: [1, 1.5, 1] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute bottom-[20%] left-[5%] w-2 h-2 rounded-full bg-accent/10"
-        animate={{ y: [0, -20, 0], opacity: [0.3, 0.7, 0.3] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute top-[40%] right-[3%] w-16 h-16 rounded-full border border-primary/5"
-        animate={{ scale: [1, 1.4, 1], opacity: [0.2, 0.4, 0.2] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute bottom-[10%] right-[40%] h-px w-20"
-        style={{ background: "linear-gradient(90deg, transparent, rgba(99,102,241,0.1), transparent)" }}
-        animate={{ x: [-40, 40, -40] }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-      />
-
       <div className="max-w-7xl mx-auto px-6 pt-32 pb-16">
         {/* Sticky scroll layout — heading lives inside the sticky left column */}
         <div className="grid md:grid-cols-2 gap-16">

@@ -34,17 +34,15 @@ function FloatingOrb({
   color,
   x,
   y,
-  delay,
 }: {
   size: number;
   color: string;
   x: string;
   y: string;
-  delay: number;
 }) {
   return (
-    <motion.div
-      className="absolute rounded-full blur-3xl"
+    <div
+      className="absolute rounded-full blur-3xl animate-float"
       style={{
         width: size,
         height: size,
@@ -52,39 +50,9 @@ function FloatingOrb({
         left: x,
         top: y,
       }}
-      animate={{
-        x: [0, 30, -20, 0],
-        y: [0, -40, 20, 0],
-        scale: [1, 1.2, 0.9, 1],
-      }}
-      transition={{
-        duration: 12,
-        delay,
-        repeat: Infinity,
-        ease: "easeInOut",
-      }}
     />
   );
 }
-
-// Deterministic particle data to avoid SSR/client Math.random() mismatch
-const PARTICLES = [
-  { x: 5, dur: 10, sz: 2.5, drift: -3 },
-  { x: 12, dur: 14, sz: 3.2, drift: 2 },
-  { x: 22, dur: 9, sz: 2.8, drift: -1 },
-  { x: 30, dur: 13, sz: 4.0, drift: 4 },
-  { x: 38, dur: 11, sz: 2.2, drift: -2 },
-  { x: 45, dur: 15, sz: 3.5, drift: 1 },
-  { x: 52, dur: 10, sz: 2.0, drift: -4 },
-  { x: 60, dur: 12, sz: 3.8, drift: 3 },
-  { x: 68, dur: 14, sz: 2.6, drift: -2 },
-  { x: 75, dur: 9, sz: 4.2, drift: 1 },
-  { x: 82, dur: 13, sz: 3.0, drift: -3 },
-  { x: 90, dur: 11, sz: 2.4, drift: 2 },
-  { x: 15, dur: 16, sz: 3.3, drift: -1 },
-  { x: 48, dur: 10, sz: 2.7, drift: 4 },
-  { x: 95, dur: 12, sz: 3.6, drift: -2 },
-];
 
 function GridBackground() {
   return (
@@ -100,112 +68,13 @@ function GridBackground() {
           backgroundSize: "80px 80px",
         }}
       />
-      {/* Top glow */}
-      <motion.div
-        className="absolute inset-0"
+      {/* Top glow — CSS-only pulse */}
+      <div
+        className="absolute inset-0 animate-pulse-glow"
         style={{
           background:
             "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(99, 102, 241, 0.12), transparent)",
         }}
-        animate={{ opacity: [0.5, 0.8, 0.5] }}
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-      />
-
-      {/* Rising particles — deterministic values */}
-      {PARTICLES.map((p, i) => (
-        <motion.div
-          key={i}
-          className="absolute rounded-full bg-primary/20"
-          style={{ width: p.sz, height: p.sz, left: `${p.x}%`, top: "110%" }}
-          animate={{
-            y: ["-10vh", "-120vh"],
-            x: ["0vw", `${p.drift}vw`],
-            opacity: [0, 0.8, 0],
-          }}
-          transition={{
-            duration: p.dur,
-            delay: i * 1.2,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-        />
-      ))}
-
-      {/* Horizontal scanning lines */}
-      <motion.div
-        className="absolute h-px w-40 top-1/4"
-        style={{ background: "linear-gradient(90deg, transparent, rgba(99,102,241,0.15), transparent)" }}
-        animate={{ x: ["-10vw", "110vw"] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-      />
-      <motion.div
-        className="absolute h-px w-60 top-2/3"
-        style={{ background: "linear-gradient(90deg, transparent, rgba(167,139,250,0.1), transparent)" }}
-        animate={{ x: ["110vw", "-10vw"] }}
-        transition={{ duration: 15, repeat: Infinity, ease: "linear", delay: 3 }}
-      />
-      <motion.div
-        className="absolute h-px w-32 top-1/2"
-        style={{ background: "linear-gradient(90deg, transparent, rgba(99,102,241,0.08), transparent)" }}
-        animate={{ x: ["-10vw", "110vw"] }}
-        transition={{ duration: 18, repeat: Infinity, ease: "linear", delay: 6 }}
-      />
-
-      {/* Pulsing rings */}
-      <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary/5"
-        animate={{ width: [200, 600, 200], height: [200, 600, 200], opacity: [0.3, 0, 0.3] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-accent/5"
-        animate={{ width: [100, 500, 100], height: [100, 500, 100], opacity: [0.2, 0, 0.2] }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-      />
-
-      {/* Diagonal floating lines */}
-      <motion.div
-        className="absolute w-px h-32 top-[10%] left-[20%] origin-top"
-        style={{ background: "linear-gradient(180deg, rgba(99,102,241,0.12), transparent)" }}
-        animate={{ rotate: [0, 15, -15, 0], opacity: [0.3, 0.6, 0.3] }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute w-px h-24 top-[30%] right-[15%] origin-top"
-        style={{ background: "linear-gradient(180deg, rgba(167,139,250,0.1), transparent)" }}
-        animate={{ rotate: [0, -20, 20, 0], opacity: [0.2, 0.5, 0.2] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 3 }}
-      />
-
-      {/* Small diamond shapes */}
-      <motion.div
-        className="absolute w-3 h-3 top-[15%] left-[70%] border border-primary/10 rotate-45"
-        animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0.6, 0.3] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute w-2 h-2 top-[65%] left-[25%] border border-accent/10 rotate-45"
-        animate={{ scale: [1, 2, 1], opacity: [0.2, 0.5, 0.2] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-      />
-      <motion.div
-        className="absolute w-4 h-4 top-[80%] right-[30%] border border-primary/8 rotate-45"
-        animate={{ scale: [1, 1.3, 1], opacity: [0.15, 0.4, 0.15], rotate: [45, 90, 45] }}
-        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 4 }}
-      />
-
-      {/* Crossing beams */}
-      <motion.div
-        className="absolute top-0 left-1/2 w-px h-full -translate-x-1/2"
-        style={{ background: "linear-gradient(180deg, transparent 0%, rgba(99,102,241,0.04) 50%, transparent 100%)" }}
-        animate={{ opacity: [0, 0.5, 0] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute top-1/2 left-0 h-px w-full -translate-y-1/2"
-        style={{ background: "linear-gradient(90deg, transparent 0%, rgba(99,102,241,0.03) 50%, transparent 100%)" }}
-        animate={{ opacity: [0, 0.4, 0] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 3 }}
       />
     </div>
   );
@@ -378,21 +247,18 @@ export default function Hero() {
           color="rgba(99, 102, 241, 0.08)"
           x="10%"
           y="20%"
-          delay={0}
         />
         <FloatingOrb
           size={300}
           color="rgba(167, 139, 250, 0.06)"
           x="70%"
           y="60%"
-          delay={2}
         />
         <FloatingOrb
           size={200}
           color="rgba(99, 102, 241, 0.05)"
           x="50%"
           y="10%"
-          delay={4}
         />
       </motion.div>
 

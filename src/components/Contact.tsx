@@ -86,29 +86,6 @@ export default function Contact() {
       <motion.div style={{ y: bgY }} className="absolute inset-0">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-primary/[0.03] blur-3xl" />
       </motion.div>
-      {/* Animated decorations */}
-      <motion.div
-        className="absolute top-[12%] right-[10%] w-3 h-3 border border-accent/10 rotate-45"
-        animate={{ rotate: [45, 225, 45] }}
-        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute bottom-[15%] left-[8%] w-2 h-2 rounded-full bg-primary/10"
-        animate={{ y: [0, -15, 0], scale: [1, 1.5, 1] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute top-[25%] left-[3%] w-16 h-16 rounded-full border border-primary/[0.06]"
-        animate={{ scale: [1, 1.4, 1] }}
-        transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute bottom-[30%] right-[5%] w-px h-20"
-        style={{ background: "linear-gradient(180deg, transparent, rgba(99,102,241,0.06), transparent)" }}
-        animate={{ y: [-30, 30, -30] }}
-        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-      />
-
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         {/* Section heading */}
         <motion.div

@@ -283,32 +283,6 @@ export default function Projects() {
         <div className="absolute bottom-1/4 left-0 w-[400px] h-[400px] rounded-full bg-primary/[0.03] blur-3xl" />
       </motion.div>
 
-      {/* Animated decorations */}
-      <motion.div
-        className="absolute top-[8%] left-[6%] w-5 h-5 border border-primary/8 rotate-45"
-        animate={{ rotate: [45, 225, 45], scale: [1, 1.3, 1] }}
-        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute bottom-[5%] right-[8%] w-2 h-2 rounded-full bg-accent/12"
-        animate={{ y: [0, -25, 0], opacity: [0.2, 0.6, 0.2] }}
-        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute top-[50%] right-[3%] w-24 h-24 rounded-full border border-primary/[0.04]"
-        animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.3, 0.15] }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute top-[15%] right-[45%] h-px w-28"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, rgba(167,139,250,0.08), transparent)",
-        }}
-        animate={{ x: [-50, 50, -50] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-      />
-
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         {/* Section heading */}
         <motion.div

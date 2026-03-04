@@ -222,34 +222,6 @@ export default function Skills() {
       >
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/[0.03] blur-3xl" />
       </motion.div>
-      {/* Extra floating elements */}
-      <motion.div
-        className="absolute top-[5%] left-[10%] w-4 h-4 border border-primary/10 rotate-45"
-        animate={{ rotate: [45, 135, 45], y: [0, -15, 0] }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute bottom-[8%] right-[12%] w-2 h-2 rounded-full bg-primary/15"
-        animate={{ scale: [1, 2, 1], opacity: [0.3, 0.6, 0.3] }}
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute top-[30%] right-[5%] w-20 h-20 rounded-full border border-accent/5"
-        animate={{ scale: [1, 1.3, 1] }}
-        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute bottom-[25%] left-[3%] w-px h-16"
-        style={{ background: "linear-gradient(180deg, transparent, rgba(99,102,241,0.08), transparent)" }}
-        animate={{ y: [-20, 20, -20] }}
-        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute top-[60%] left-[50%] w-3 h-3 border border-accent/8 rotate-45"
-        animate={{ rotate: [45, 405], opacity: [0.2, 0.5, 0.2] }}
-        transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
-      />
-
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         {/* Section heading */}
         <motion.div
