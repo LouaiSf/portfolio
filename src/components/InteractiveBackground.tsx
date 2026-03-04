@@ -8,7 +8,7 @@ interface Shape {
   baseX: number;
   baseY: number;
   size: number;
-  type: "circle" | "ring" | "diamond" | "dot" | "cross";
+  type: "circle" | "ring" | "diamond" | "dot";
   speed: number;
   angle: number;
   orbitRadius: number;
@@ -16,31 +16,25 @@ interface Shape {
   alpha: number;
 }
 
-// Fixed seed positions so SSR and client match
+// Reduced to 8 shapes for lighter rendering
 const SHAPE_DEFS: Omit<Shape, "baseX" | "baseY">[] = [
   { x: 0, y: 0, size: 7, type: "circle", speed: 0.0003, angle: 0, orbitRadius: 40, color: "180,190,255", alpha: 0.35 },
   { x: 0, y: 0, size: 5, type: "ring", speed: 0.0005, angle: 1, orbitRadius: 30, color: "200,195,255", alpha: 0.30 },
   { x: 0, y: 0, size: 8, type: "diamond", speed: 0.0004, angle: 2, orbitRadius: 35, color: "180,190,255", alpha: 0.25 },
   { x: 0, y: 0, size: 5, type: "dot", speed: 0.0006, angle: 3, orbitRadius: 22, color: "190,200,255", alpha: 0.40 },
-  { x: 0, y: 0, size: 7, type: "cross", speed: 0.0003, angle: 4, orbitRadius: 45, color: "180,190,255", alpha: 0.20 },
   { x: 0, y: 0, size: 5, type: "circle", speed: 0.0007, angle: 0.5, orbitRadius: 28, color: "200,195,255", alpha: 0.32 },
   { x: 0, y: 0, size: 10, type: "ring", speed: 0.0002, angle: 1.5, orbitRadius: 50, color: "180,190,255", alpha: 0.18 },
-  { x: 0, y: 0, size: 5, type: "diamond", speed: 0.0005, angle: 2.5, orbitRadius: 25, color: "190,200,255", alpha: 0.28 },
   { x: 0, y: 0, size: 6, type: "dot", speed: 0.0004, angle: 3.5, orbitRadius: 38, color: "180,190,255", alpha: 0.25 },
-  { x: 0, y: 0, size: 8, type: "circle", speed: 0.0003, angle: 4.5, orbitRadius: 42, color: "200,195,255", alpha: 0.22 },
-  { x: 0, y: 0, size: 5, type: "cross", speed: 0.0006, angle: 5, orbitRadius: 30, color: "180,190,255", alpha: 0.30 },
-  { x: 0, y: 0, size: 7, type: "ring", speed: 0.0004, angle: 5.5, orbitRadius: 35, color: "190,200,255", alpha: 0.20 },
-  { x: 0, y: 0, size: 5, type: "diamond", speed: 0.0003, angle: 0.8, orbitRadius: 45, color: "180,190,255", alpha: 0.26 },
-  { x: 0, y: 0, size: 8, type: "dot", speed: 0.0005, angle: 2.2, orbitRadius: 28, color: "200,195,255", alpha: 0.35 },
-  { x: 0, y: 0, size: 7, type: "circle", speed: 0.0004, angle: 3.8, orbitRadius: 40, color: "180,190,255", alpha: 0.22 },
+  { x: 0, y: 0, size: 8, type: "diamond", speed: 0.0003, angle: 4.5, orbitRadius: 42, color: "200,195,255", alpha: 0.22 },
 ];
 
-// Seed positions evenly across viewport
 const POSITIONS = [
-  [0.08, 0.12], [0.25, 0.08], [0.42, 0.15], [0.62, 0.06], [0.85, 0.14],
-  [0.1, 0.4], [0.35, 0.35], [0.55, 0.45], [0.78, 0.38], [0.92, 0.5],
-  [0.05, 0.7], [0.3, 0.65], [0.5, 0.75], [0.72, 0.68], [0.88, 0.8],
+  [0.08, 0.12], [0.30, 0.08], [0.55, 0.15], [0.85, 0.10],
+  [0.10, 0.45], [0.50, 0.50], [0.80, 0.42], [0.30, 0.75],
 ];
+
+// Target ~30fps
+const FRAME_INTERVAL = 1000 / 30;
 
 export default function InteractiveBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -48,6 +42,8 @@ export default function InteractiveBackground() {
   const shapes = useRef<Shape[]>([]);
   const animRef = useRef(0);
   const timeRef = useRef(0);
+  const lastFrameTime = useRef(0);
+  const visibleRef = useRef(true);
 
   const initShapes = useCallback((w: number, h: number) => {
     shapes.current = SHAPE_DEFS.map((def, i) => {
@@ -77,7 +73,20 @@ export default function InteractiveBackground() {
     };
     window.addEventListener("mousemove", handleMouse);
 
-    const draw = () => {
+    // Pause when tab is hidden
+    const handleVisibility = () => {
+      visibleRef.current = !document.hidden;
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    const draw = (now: number) => {
+      animRef.current = requestAnimationFrame(draw);
+
+      // Skip if tab hidden or not enough time elapsed (throttle to ~30fps)
+      if (!visibleRef.current) return;
+      if (now - lastFrameTime.current < FRAME_INTERVAL) return;
+      lastFrameTime.current = now;
+
       if (!ctx || !canvas) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       timeRef.current += 1;
@@ -96,12 +105,10 @@ export default function InteractiveBackground() {
       }
 
       for (const s of shapes.current) {
-        // Orbit around base position
         s.angle += s.speed;
         const ox = s.baseX + Math.cos(s.angle * 60) * s.orbitRadius;
         const oy = s.baseY + Math.sin(s.angle * 60) * s.orbitRadius;
 
-        // Repel gently from mouse
         const dx = ox - mx;
         const dy = oy - my;
         const dist = Math.sqrt(dx * dx + dy * dy);
@@ -113,11 +120,9 @@ export default function InteractiveBackground() {
           pushY = (dy / dist) * force;
         }
 
-        // Smooth lerp
         s.x += (ox + pushX - s.x) * 0.05;
         s.y += (oy + pushY - s.y) * 0.05;
 
-        // Breathing alpha
         const breathe = 0.7 + 0.3 * Math.sin(timeRef.current * 0.02 + s.angle * 10);
         const alpha = s.alpha * breathe;
 
@@ -150,28 +155,17 @@ export default function InteractiveBackground() {
             ctx.arc(0, 0, s.size * 0.6, 0, Math.PI * 2);
             ctx.fillStyle = `rgba(${s.color}, 1)`;
             ctx.fill();
-            // Outer glow
             ctx.beginPath();
             ctx.arc(0, 0, s.size * 2, 0, Math.PI * 2);
             ctx.fillStyle = `rgba(${s.color}, 0.15)`;
             ctx.fill();
-            break;
-          case "cross":
-            ctx.strokeStyle = `rgba(${s.color}, 1)`;
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            ctx.moveTo(-s.size, 0);
-            ctx.lineTo(s.size, 0);
-            ctx.moveTo(0, -s.size);
-            ctx.lineTo(0, s.size);
-            ctx.stroke();
             break;
         }
 
         ctx.restore();
       }
 
-      // Draw faint connection lines between nearby shapes
+      // Connection lines between nearby shapes
       ctx.lineWidth = 0.8;
       for (let i = 0; i < shapes.current.length; i++) {
         for (let j = i + 1; j < shapes.current.length; j++) {
@@ -190,8 +184,6 @@ export default function InteractiveBackground() {
           }
         }
       }
-
-      animRef.current = requestAnimationFrame(draw);
     };
 
     animRef.current = requestAnimationFrame(draw);
@@ -199,6 +191,7 @@ export default function InteractiveBackground() {
     return () => {
       window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", handleMouse);
+      document.removeEventListener("visibilitychange", handleVisibility);
       cancelAnimationFrame(animRef.current);
     };
   }, [initShapes]);
