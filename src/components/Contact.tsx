@@ -71,9 +71,14 @@ export default function Contact() {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
+    // Open the user's mail client with the message pre-composed.
+    const subject = `Portfolio contact from ${formState.name || "someone"}`;
+    const body = `${formState.message}\n\n— ${formState.name}\n${formState.email}`;
+    window.location.href = `mailto:louai.nasrellah.soufi@ensia.edu.dz?subject=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
     setSubmitted(true);
     setTimeout(() => setSubmitted(false), 3000);
-    setFormState({ name: "", email: "", message: "" });
   };
 
   return (
@@ -304,7 +309,7 @@ export default function Contact() {
                 className="group relative w-full py-4 rounded-xl bg-primary/10 border border-primary/30 text-primary font-medium text-sm hover:bg-primary/20 hover:border-primary/50 transition-all duration-300 hover:shadow-[0_0_30px_rgba(99,102,241,0.2)] overflow-hidden"
               >
                 <span className="relative z-10">
-                  {submitted ? "Message Sent! ✓" : "Send Message"}
+                  {submitted ? "Opening your email… ✓" : "Send Message"}
                 </span>
               </MagneticButton>
             </form>

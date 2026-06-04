@@ -9,122 +9,57 @@ import {
   useSpring,
 } from "framer-motion";
 
-interface Skill {
-  name: string;
-  level: number;
-  color: string;
-}
-
 interface SkillCategory {
   title: string;
   icon: string;
-  skills: Skill[];
+  skills: string[];
 }
 
 const skillCategories: SkillCategory[] = [
   {
     title: "Programming",
     icon: "⟨/⟩",
-    skills: [
-      { name: "Python", level: 90, color: "#6366f1" },
-      { name: "C++", level: 75, color: "#818cf8" },
-      { name: "JavaScript", level: 85, color: "#a78bfa" },
-      { name: "PHP", level: 65, color: "#6366f1" },
-      { name: "Bash", level: 60, color: "#818cf8" },
-    ],
+    skills: ["Python", "C++", "JavaScript", "TypeScript", "PHP", "Bash"],
   },
   {
     title: "Machine Learning",
     icon: "⊛",
     skills: [
-      { name: "Scikit-learn", level: 85, color: "#6366f1" },
-      { name: "Pandas", level: 90, color: "#818cf8" },
-      { name: "NumPy", level: 88, color: "#a78bfa" },
-      { name: "Feature Engineering", level: 80, color: "#6366f1" },
-      { name: "Model Evaluation", level: 82, color: "#818cf8" },
+      "PyTorch",
+      "TensorFlow Lite",
+      "Scikit-learn",
+      "Pandas",
+      "NumPy",
+      "Computer Vision",
     ],
   },
   {
-    title: "Frontend",
+    title: "Web",
     icon: "◈",
-    skills: [
-      { name: "React", level: 85, color: "#6366f1" },
-      { name: "Next.js", level: 80, color: "#818cf8" },
-    ],
-  },
-  {
-    title: "Backend",
-    icon: "⬡",
-    skills: [
-      { name: "Express", level: 80, color: "#6366f1" },
-      { name: "Node.js", level: 82, color: "#818cf8" },
-    ],
+    skills: ["React", "Next.js", "Node.js", "Express"],
   },
   {
     title: "Mobile",
     icon: "◻",
-    skills: [{ name: "Flutter", level: 75, color: "#6366f1" }],
+    skills: ["Flutter", "Dart", "Hive", "On-Device ML"],
   },
   {
-    title: "Databases",
+    title: "Data & Backend",
     icon: "⊞",
-    skills: [
-      { name: "MySQL", level: 80, color: "#6366f1" },
-      { name: "Oracle SQL", level: 70, color: "#818cf8" },
-      { name: "Firebase", level: 75, color: "#a78bfa" },
-      { name: "Supabase", level: 72, color: "#6366f1" },
-    ],
+    skills: ["Supabase", "Firebase", "MySQL", "Oracle SQL"],
   },
   {
     title: "Tools",
     icon: "⚙",
-    skills: [
-      { name: "Git", level: 88, color: "#6366f1" },
-      { name: "Linux", level: 80, color: "#818cf8" },
-      { name: "Jupyter", level: 85, color: "#a78bfa" },
-    ],
+    skills: ["Git", "Docker", "Linux", "Jupyter"],
   },
 ];
 
-function SkillBar({
-  skill,
-  index,
-}: {
-  skill: Skill;
-  index: number;
-}) {
+function SkillChip({ name }: { name: string }) {
   return (
-    <div className="mb-3 last:mb-0">
-      <div className="flex justify-between items-center mb-1.5">
-        <span className="text-sm text-foreground/80">{skill.name}</span>
-        <motion.span
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ delay: 0.5 + index * 0.1 }}
-          viewport={{ margin: "-50px" }}
-          className="text-xs font-mono text-primary/60"
-        >
-          {skill.level}%
-        </motion.span>
-      </div>
-      <div className="h-1.5 bg-surface-light rounded-full overflow-hidden">
-        <motion.div
-          initial={{ width: 0 }}
-          whileInView={{ width: `${skill.level}%` }}
-          transition={{
-            duration: 1.2,
-            delay: 0.3 + index * 0.1,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-          viewport={{ margin: "-50px" }}
-          className="h-full rounded-full"
-          style={{
-            background: `linear-gradient(90deg, ${skill.color}, ${skill.color}88)`,
-            boxShadow: `0 0 10px ${skill.color}40`,
-          }}
-        />
-      </div>
-    </div>
+    <span className="text-xs px-3 py-1.5 rounded-lg bg-primary/[0.07] border border-primary/10 text-foreground/80 transition-colors duration-300 group-hover:border-primary/25 group-hover:text-foreground">
+      {name}
+    </span>
   );
 }
 
@@ -192,9 +127,11 @@ function Card3D({
         </div>
 
         {/* Skills */}
-        {category.skills.map((skill, i) => (
-          <SkillBar key={skill.name} skill={skill} index={i} />
-        ))}
+        <div className="flex flex-wrap gap-2">
+          {category.skills.map((skill) => (
+            <SkillChip key={skill} name={skill} />
+          ))}
+        </div>
       </div>
     </motion.div>
   );

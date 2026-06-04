@@ -87,16 +87,8 @@ export default function About() {
                   <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-primary/40 rounded-br-2xl" />
                 </div>
 
-                <motion.div
-                  animate={{ rotate: [0, 360] }}
-                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                  className="absolute -top-6 -right-6 w-24 h-24 border border-primary/10 rounded-full"
-                />
-                <motion.div
-                  animate={{ rotate: [360, 0] }}
-                  transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                  className="absolute -bottom-4 -left-4 w-16 h-16 border border-accent/10 rounded-full"
-                />
+                <div className="absolute -top-6 -right-6 w-24 h-24 border border-primary/10 rounded-full animate-spin-slow" />
+                <div className="absolute -bottom-4 -left-4 w-16 h-16 border border-accent/10 rounded-full animate-spin-reverse-slow" />
               </div>
             </motion.div>
           </div>

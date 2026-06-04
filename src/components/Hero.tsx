@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import {
   motion,
@@ -152,9 +152,11 @@ function TypewriterSubtext() {
       // pause before deleting
       timeout = setTimeout(() => setIsDeleting(true), 2000);
     } else if (isDeleting && displayed === "") {
-      // move to next phrase
-      setIsDeleting(false);
-      setPhraseIdx((prev) => (prev + 1) % TYPEWRITER_PHRASES.length);
+      // move to next phrase (deferred so we don't setState synchronously in the effect)
+      timeout = setTimeout(() => {
+        setIsDeleting(false);
+        setPhraseIdx((prev) => (prev + 1) % TYPEWRITER_PHRASES.length);
+      }, 400);
     } else {
       const speed = isDeleting ? 40 : 80;
       timeout = setTimeout(() => {
@@ -370,20 +372,19 @@ export default function Hero() {
         >
           {/* Glow behind photo */}
           <div className="absolute -inset-4 rounded-full bg-primary/10 blur-3xl animate-pulse-glow" />
-          {/* Rotating ring decoration */}
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="absolute -inset-4 rounded-full border border-dashed border-primary/20"
-          />
-          <motion.div
-            animate={{ rotate: -360 }}
-            transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-            className="absolute -inset-8 rounded-full border border-dashed border-accent/10"
-          />
+          {/* Rotating ring decoration — CSS-driven (off the JS thread) */}
+          <div className="absolute -inset-4 rounded-full border border-dashed border-primary/20 animate-spin-slow" />
+          <div className="absolute -inset-8 rounded-full border border-dashed border-accent/10 animate-spin-reverse-slow" />
           {/* Photo container */}
           <div className="relative w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden border-2 border-primary/20 bg-surface/60">
-            <Image src="/me.png" alt="Louai Soufi" fill className="object-cover" priority />
+            <Image
+              src="/me.png"
+              alt="Louai Soufi"
+              fill
+              sizes="(max-width: 768px) 192px, 256px"
+              className="object-cover"
+              priority
+            />
           </div>
           {/* Small floating badge */}
           <motion.div

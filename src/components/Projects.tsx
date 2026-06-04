@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
+import Image from "next/image";
 import {
   motion,
   useScroll,
@@ -16,12 +17,57 @@ interface Project {
   longDescription: string;
   tags: string[];
   gradient: string;
-  icon: string;
-  link: string;
-  linkLabel: string;
+  /** Optional screenshot in /public (e.g. "/projects/streetwatch.png"). Falls back to a branded monogram header when absent. */
+  image?: string;
+  link?: string;
+  linkLabel?: string;
+}
+
+/** Derive a 1–2 letter monogram from a project title for the fallback header. */
+function getMonogram(title: string): string {
+  const caps = title.match(/[A-Z]/g);
+  if (caps && caps.length >= 2) return caps.slice(0, 2).join("");
+  return title.replace(/[^A-Za-z]/g, "").slice(0, 2).toUpperCase();
 }
 
 const projects: Project[] = [
+  {
+    id: 5,
+    title: "StreetWatch — Citizen Road-Damage Reporting",
+    shortTitle: "StreetWatch",
+    description:
+      "Offline-first mobile app where citizens report road damage, with an on-device CNN that classifies the damage type from a photo.",
+    longDescription:
+      "A two-part platform for road infrastructure. The Flutter mobile app lets citizens sign in with Google, explore an interactive map of nearby damage reports filterable by type, browse a community feed where they can upvote and filter reports, and capture new reports with the camera. The core feature is fully on-device image classification with TensorFlow Lite: a captured photo is split into 112×112 patches, each patch is classified, and the report's damage type (pothole, alligator crack, transversal crack, …) is decided by aggregating the patch predictions. A dedicated 'background' class trained into the model gates out irrelevant photos, so random captures are rejected before a report is created. The app is offline-first — inference runs locally, reports are cached in a local Hive database, and captures made without connectivity sit in an offline queue that syncs to Supabase automatically once a connection returns. Gamification (leaderboard and badges) rewards active reporters. A companion web dashboard for authorities (Next.js / React) provides analytics over incoming reports and lets officials triage and mark reports as fixed.",
+    tags: [
+      "Flutter",
+      "TensorFlow Lite",
+      "Supabase",
+      "Hive",
+      "Docker",
+      "Next.js",
+    ],
+    gradient: "from-amber-500/20 to-orange-500/20",
+    image: "/streetwatch_bg.png",
+    linkLabel: "Link coming soon",
+  },
+  {
+    id: 6,
+    title: "Privacy-Preserving Face Recognition via Federated Learning",
+    shortTitle: "Federated Face Recognition",
+    description:
+      "Face-recognition models trained across client devices using federated learning — no raw image ever leaves the device.",
+    longDescription:
+      "A privacy-preserving face-recognition system trained with federated learning, so no single face image is ever sent to a central server. Training starts from a model pretrained on public celebrity faces. Each round, every client device fine-tunes the shared baseline locally using only its own positive-class images, then sends just the updated weights (never the images) to the central server. The server applies spread-out regularization to keep identity embeddings well separated, averages the client updates into a new global model, and redistributes it to the clients. This loop repeats for several iterations, progressively improving recognition while keeping all biometric data on-device.",
+    tags: [
+      "PyTorch",
+      "Federated Learning",
+      "Privacy-Preserving ML",
+      "Face Recognition",
+      "Computer Vision",
+    ],
+    gradient: "from-cyan-500/20 to-blue-500/20",
+  },
   {
     id: 1,
     title: "Fantasy Premier League Points Prediction System",
@@ -32,7 +78,6 @@ const projects: Project[] = [
       "A comprehensive machine learning system that predicts Fantasy Premier League player points using historical performance data. Features include automated data collection, feature engineering pipelines, multiple model comparison (Random Forest, XGBoost, Neural Networks), and a systematic evaluation framework with cross-validation and hyperparameter tuning.",
     tags: ["Python", "Scikit-learn", "Pandas", "ML Pipeline", "Feature Engineering"],
     gradient: "from-indigo-500/20 to-purple-500/20",
-    icon: "⚽",
     link: "https://github.com/LouaiSf/Fantasy-premier-league-points-prediction",
     linkLabel: "View on GitHub",
   },
@@ -46,7 +91,6 @@ const projects: Project[] = [
       "An intelligent job matching platform that leverages classical AI algorithms to optimally pair candidates with job opportunities. Implements A* search for optimal path finding in skill-matching graphs, Genetic Algorithms for multi-objective optimization of match quality, and CSP solvers for constraint satisfaction across multiple hiring criteria.",
     tags: ["Python", "A*", "Genetic Algorithms", "CSP", "Optimization"],
     gradient: "from-violet-500/20 to-fuchsia-500/20",
-    icon: "🤖",
     link: "https://github.com/HassaneAitAhmed/Job-Matching-AI-Platform",
     linkLabel: "View on GitHub",
   },
@@ -60,9 +104,9 @@ const projects: Project[] = [
       "A mobile application built with Flutter and Firebase that connects amateur football players. Key features include real-time match scheduling, player profiles, skill-based matchmaking, team formation tools, and a social feed for local football communities. Uses Firebase for real-time data sync and authentication.",
     tags: ["Flutter", "Firebase", "Dart", "Mobile", "Real-time"],
     gradient: "from-emerald-500/20 to-teal-500/20",
-    icon: "📱",
     link: "https://footlink-ochre.vercel.app/",
     linkLabel: "View Live",
+    image: "/footlink_bg.png",
   },
   {
     id: 4,
@@ -74,7 +118,6 @@ const projects: Project[] = [
       "A production-ready appointment management platform featuring a responsive React/Next.js frontend with an Express.js backend. Includes real-time availability checking, automated scheduling, email notifications, role-based access control, and a dashboard with analytics. Built with modern full-stack practices including REST APIs and Supabase for database and auth.",
     tags: ["React", "Next.js", "Express", "Node.js", "Supabase"],
     gradient: "from-blue-500/20 to-cyan-500/20",
-    icon: "📅",
     link: "https://medi-connect-amber.vercel.app/home",
     linkLabel: "View Live",
   },
@@ -97,23 +140,35 @@ function StaticCard({
     >
       {/* Project visual header */}
       <div
-        className={`relative h-48 md:h-56 bg-gradient-to-br ${project.gradient} overflow-hidden`}
+        className={`relative aspect-[16/9] overflow-hidden bg-gradient-to-br ${project.gradient}`}
       >
-        <div
-          className="absolute inset-0 opacity-30"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)
-            `,
-            backgroundSize: "40px 40px",
-          }}
-        />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-6xl md:text-7xl opacity-40 group-hover:opacity-60 transition-opacity duration-500">
-            {project.icon}
-          </span>
-        </div>
+        {project.image ? (
+          <Image
+            src={project.image}
+            alt={project.shortTitle}
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <>
+            <div
+              className="absolute inset-0 opacity-30"
+              style={{
+                backgroundImage: `
+                  linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)
+                `,
+                backgroundSize: "40px 40px",
+              }}
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-6xl md:text-7xl font-bold tracking-tight text-white/15 group-hover:text-white/25 transition-colors duration-500">
+                {getMonogram(project.shortTitle)}
+              </span>
+            </div>
+          </>
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
           <span className="text-sm font-medium text-primary">
             Click to explore →
@@ -172,7 +227,7 @@ function ProjectModal({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-xl overflow-hidden"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/90 backdrop-blur-md overflow-hidden"
     >
       <motion.div
         initial={{ scale: 0.8, opacity: 0, y: 50 }}
@@ -183,16 +238,26 @@ function ProjectModal({
         className="relative max-w-2xl w-full max-h-[90vh] rounded-3xl border border-primary/20 bg-surface overflow-y-auto shadow-2xl shadow-primary/10"
       >
         <div
-          className={`relative h-40 bg-gradient-to-br ${project.gradient} flex items-center justify-center`}
+          className={`relative aspect-[16/9] overflow-hidden flex items-center justify-center bg-gradient-to-br ${project.gradient}`}
         >
-          <motion.span
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-            className="text-7xl"
-          >
-            {project.icon}
-          </motion.span>
+          {project.image ? (
+            <Image
+              src={project.image}
+              alt={project.shortTitle}
+              fill
+              sizes="(max-width: 768px) 100vw, 640px"
+              className="object-cover"
+            />
+          ) : (
+            <motion.span
+              initial={{ scale: 0.6, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.15, type: "spring", stiffness: 200 }}
+              className="text-7xl font-bold tracking-tight text-white/20"
+            >
+              {getMonogram(project.shortTitle)}
+            </motion.span>
+          )}
           <button
             onClick={onClose}
             className="absolute top-4 right-4 w-10 h-10 rounded-full bg-background/50 backdrop-blur-sm border border-white/10 flex items-center justify-center text-foreground/70 hover:text-foreground hover:bg-background/80 transition-all"
@@ -235,20 +300,31 @@ function ProjectModal({
               </motion.span>
             ))}
           </motion.div>
-          <motion.a
-            href={project.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.55 }}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary/10 border border-primary/20 text-primary font-medium text-sm hover:bg-primary/20 hover:border-primary/40 transition-all duration-300"
-          >
-            {project.linkLabel}
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
-          </motion.a>
+          {project.link ? (
+            <motion.a
+              href={project.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.55 }}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary/10 border border-primary/20 text-primary font-medium text-sm hover:bg-primary/20 hover:border-primary/40 transition-all duration-300"
+            >
+              {project.linkLabel ?? "View project"}
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </motion.a>
+          ) : (
+            <motion.span
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.55 }}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-surface-light/60 border border-primary/10 text-muted font-medium text-sm"
+            >
+              {project.linkLabel ?? "Link coming soon"}
+            </motion.span>
+          )}
         </div>
       </motion.div>
     </motion.div>

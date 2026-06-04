@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useCallback } from "react";
+import { useHeavyAnimations } from "@/hooks/useHeavyAnimations";
 
 interface Shape {
   x: number;
@@ -37,6 +38,7 @@ const POSITIONS = [
 const FRAME_INTERVAL = 1000 / 30;
 
 export default function InteractiveBackground() {
+  const enabled = useHeavyAnimations();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouse = useRef({ x: -1000, y: -1000 });
   const shapes = useRef<Shape[]>([]);
@@ -55,6 +57,7 @@ export default function InteractiveBackground() {
   }, []);
 
   useEffect(() => {
+    if (!enabled) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -194,7 +197,11 @@ export default function InteractiveBackground() {
       document.removeEventListener("visibilitychange", handleVisibility);
       cancelAnimationFrame(animRef.current);
     };
-  }, [initShapes]);
+  }, [initShapes, enabled]);
+
+  // On phones / touch devices / reduced-motion users we skip the canvas entirely
+  // (no pointer to interact with it) and let the static CSS gradients carry the look.
+  if (!enabled) return null;
 
   return (
     <canvas
