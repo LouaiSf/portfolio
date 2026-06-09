@@ -67,6 +67,9 @@ const projects: Project[] = [
       "Computer Vision",
     ],
     gradient: "from-cyan-500/20 to-blue-500/20",
+    image: "/face_recognition.jpg",
+    linkLabel: "View in Github",
+    link: "https://github.com/akrambel2115/Privacy-Preserving-Face-Recognition-using-Federated-Learning",
   },
   {
     id: 1,
@@ -80,6 +83,7 @@ const projects: Project[] = [
     gradient: "from-indigo-500/20 to-purple-500/20",
     link: "https://github.com/LouaiSf/Fantasy-premier-league-points-prediction",
     linkLabel: "View on GitHub",
+    image: "/fpl.jpg",
   },
   {
     id: 2,
@@ -93,6 +97,7 @@ const projects: Project[] = [
     gradient: "from-violet-500/20 to-fuchsia-500/20",
     link: "https://github.com/HassaneAitAhmed/Job-Matching-AI-Platform",
     linkLabel: "View on GitHub",
+    image: "/job_matching.jpg",
   },
   {
     id: 3,
@@ -120,6 +125,7 @@ const projects: Project[] = [
     gradient: "from-blue-500/20 to-cyan-500/20",
     link: "https://medi-connect-amber.vercel.app/home",
     linkLabel: "View Live",
+    image: "/mediconnect.png",
   },
 ];
 
